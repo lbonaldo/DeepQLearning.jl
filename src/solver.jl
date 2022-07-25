@@ -200,6 +200,9 @@ function batch_train!(solver::DeepQLearningSolver,
     s_batch, a_batch, r_batch, sp_batch, done_batch, indices, importance_weights = sample(replay)
    
     active_q = getnetwork(policy) 
+
+    gpu.([active_q, target_q, s_batch, a_batch, r_batch, sp_batch, done_batch, importance_weights])
+
     p = params(active_q)
 
     loss_val = nothing

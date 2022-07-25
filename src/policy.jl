@@ -38,6 +38,7 @@ actionmap(p::NNPolicy) = p.action_map
 function _action(policy::NNPolicy, o)
     if ndims(o) == policy.n_input_dims
         obatch = reshape(o, (size(o)...,1))
+        obatch |> gpu
         vals = policy.qnetwork(obatch)
         return policy.action_map[argmax(vals)]
     else 
@@ -48,6 +49,7 @@ end
 function _actionvalues(policy::NNPolicy{P,Q,A}, o::AbstractArray{T,N}) where {P,Q,A,T<:Real,N}
     if ndims(o) == policy.n_input_dims
         obatch = reshape(o, (size(o)...,1))
+        obatch |> gpu
         return dropdims(policy.qnetwork(obatch), dims=2)
     else 
         throw("NNPolicyError: was expecting an array with $(policy.n_input_dims) dimensions, got $(ndims(o))")
@@ -57,6 +59,7 @@ end
 function _value(policy::NNPolicy{P}, o::AbstractArray{T,N}) where {P,T<:Real,N}
     if ndims(o) == policy.n_input_dims
         obatch = reshape(o, (size(o)...,1))
+        obatch |> gpu
         return maximum(policy.qnetwork(obatch))
     else 
         throw("NNPolicyError: was expecting an array with $(policy.n_input_dims) dimensions, got $(ndims(o))")
